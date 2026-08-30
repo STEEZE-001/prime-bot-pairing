@@ -1,105 +1,48 @@
 const express = require('express');
-const { 
-    default: makeWASocket, 
-    useMultiFileAuthState, 
-    delay, 
-    fetchLatestBaileysVersion, 
-    DisconnectReason 
-} = require('@whiskeysockets/baileys');
-const pino = require('pino');
-const fs = require('fs');
-const path = require('path');
-const { HttpsProxyAgent } = require('https-proxy-agent');
+const cors = require('cors');
+const { TiktokDL } = require('@tobyg74/tiktok-api-dl');
 
 const app = express();
-app.use(express.static(__dirname));
 
-// OPTIONAL: If WhatsApp blocks Render's IP, get a free proxy at webshare.io 
-// and insert your proxy URL below. Leave empty if testing without proxy.
-const PROXY_URL = process.env.PROXY_URL || ""; 
+// Enable CORS so your frontend can communicate with this backend
+app.use(cors());
+app.use(express.json());
 
-app.get('/pair', async (req, res) => {
-    let num = req.query.number ? req.query.number.replace(/[^0-9]/g, '') : '';
-    if (!num) return res.status(400).send({ error: "Phone number is required" });
+// Serve static HTML/CSS directly if hosted together
+app.use(express.static('.'));
 
-    const sessionDir = path.join(__dirname, `./temp_${Date.now()}`);
-    const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+// Download Endpoint
+app.post('/api/download', async (req, res) => {
+  const { videoUrl } = req.body;
 
-    try {
-        const { version } = await fetchLatestBaileysVersion();
-        
-        // Configure Agent if Proxy URL is provided
-        const agent = PROXY_URL ? new HttpsProxyAgent(PROXY_URL) : undefined;
+  if (!videoUrl) {
+    return res.status(400).json({ success: false, message: 'Please provide a valid TikTok URL.' });
+  }
 
-        const sock = makeWASocket({
-            auth: state,
-            version,
-            agent,
-            printQRInTerminal: false,
-            logger: pino({ level: 'fatal' }),
-            browser: ["Ubuntu", "Chrome", "20.0.04"],
-            connectTimeoutMs: 60000,
-            defaultQueryTimeoutMs: 0,
-            keepAliveIntervalMs: 10000,
-            emitOwnEvents: true,
-            fireInitQueries: true
-        });
+  try {
+    const result = await TiktokDL(videoUrl, { version: 'v1' });
 
-        sock.ev.on('creds.update', saveCreds);
+    if (result.status === 'success' && result.result) {
+      // Find video without watermark link
+      const videoData = result.result;
+      const downloadLink = videoData.video[0] || videoData.video[1];
 
-        // Wait 3 seconds for WebSocket initialization
-        await delay(3000);
-
-        if (!sock.authState.creds.registered) {
-            // Request code from WhatsApp
-            const rawCode = await sock.requestPairingCode(num);
-            const formattedCode = rawCode?.match(/.{1,4}/g)?.join("-") || rawCode;
-            
-            // Send response back to frontend
-            res.send({ code: formattedCode });
-        }
-
-        // Listen for user linking the device
-        sock.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect } = update;
-
-            if (connection === 'open') {
-                await delay(3000);
-                const credsFile = path.join(sessionDir, 'creds.json');
-                
-                if (fs.existsSync(credsFile)) {
-                    const credsData = fs.readFileSync(credsFile);
-                    const sessionString = Buffer.from(credsData).toString('base64');
-                    const sessionId = `PrimeBot~${sessionString}`;
-
-                    // Send PrimeBot Session ID to user's WhatsApp PM
-                    await sock.sendMessage(`${num}@s.whatsapp.net`, {
-                        text: `*PRIME BOT SESSION ID*\n\nHere is your official Session ID. Copy it to deploy your bot:\n\n\`\`\`${sessionId}\`\`\`\n\n⚠️ Keep this private!`
-                    });
-                }
-
-                // Wait before closing socket and clearing temp files
-                await delay(3000);
-                sock.ws.close();
-                fs.rmSync(sessionDir, { recursive: true, force: true });
-            } else if (connection === 'close') {
-                const reason = lastDisconnect?.error?.output?.statusCode;
-                // Clean up session directory if connection fails or is logged out
-                if (reason === DisconnectReason.loggedOut || reason === 401) {
-                    if (fs.existsSync(sessionDir)) {
-                        fs.rmSync(sessionDir, { recursive: true, force: true });
-                    }
-                }
-            }
-        });
-
-    } catch (e) {
-        console.error("Pairing Error:", e);
-        if (!res.headersSent) {
-            res.status(500).send({ error: "Failed to generate pairing code. Please try again." });
-        }
+      return res.json({
+        success: true,
+        title: videoData.description || 'Prime Downloader Video',
+        cover: videoData.cover[0],
+        downloadUrl: downloadLink
+      });
+    } else {
+      return res.status(400).json({ success: false, message: 'Unable to fetch video. Check link and try again.' });
     }
+  } catch (error) {
+    console.error('Extraction Error:', error);
+    return res.status(500).json({ success: false, message: 'Server error processing video.' });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Prime Bot Pairing Server active on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Prime Downloader running on port ${PORT}`);
+});

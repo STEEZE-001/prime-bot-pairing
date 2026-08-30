@@ -1,14 +1,14 @@
 {
-  "name": "prime-pairing-site",
+  "name": "prime-downloader",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "TikTok video downloader backend for Prime Downloader",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.9",
-    "express": "^4.19.2",
-    "https-proxy-agent": "^7.0.4",
-    "pino": "^9.0.0"
+    "@tobyg74/tiktok-api-dl": "^1.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   }
 }

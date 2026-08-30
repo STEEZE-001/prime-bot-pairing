@@ -1,240 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Bot - Pairing Hub</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background-color: #080808;
-            color: #e2e8f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .card {
-            background: #121212;
-            width: 100%;
-            max-width: 420px;
-            padding: 35px 25px;
-            border-radius: 16px;
-            border: 1px solid #1f2937;
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.08);
-            text-align: center;
-        }
-
-        .brand-icon {
-            font-size: 42px;
-            color: #22c55e;
-            margin-bottom: 12px;
-            text-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-        }
-
-        h2 {
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .subtitle {
-            color: #9ca3af;
-            font-size: 13px;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            color: #22c55e;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 10px;
-            border: 1px solid #27272a;
-            background: #09090b;
-            color: #ffffff;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            border-color: #22c55e;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
-        }
-
-        button.btn-submit {
-            background: #22c55e;
-            color: #000000;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);
-        }
-
-        button.btn-submit:hover {
-            background: #16a34a;
-            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
-        }
-
-        button.btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        /* Result Code Box Area */
-        .code-container {
-            display: none;
-            margin-top: 25px;
-            background: #09090b;
-            border: 1px solid #22c55e;
-            border-radius: 10px;
-            padding: 12px 16px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .code-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 20px;
-            font-weight: bold;
-            color: #22c55e;
-            letter-spacing: 2px;
-        }
-
-        .copy-btn {
-            background: #18181b;
-            color: #22c55e;
-            border: 1px solid #27272a;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #22c55e;
-            color: #000;
-        }
-
-        .status-msg {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #9ca3af;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prime Downloader - TikTok Video Downloader</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: #1e293b; width: 100%; max-width: 480px; padding: 28px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; }
+    h1 { color: #38bdf8; font-size: 1.8rem; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px; }
+    .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 1rem; outline: none; }
+    input:focus { border-color: #38bdf8; }
+    button { background: #38bdf8; color: #0f172a; font-weight: bold; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #0284c7; color: #fff; }
+    #result { margin-top: 20px; display: none; }
+    #result img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
+    .dl-btn { display: block; background: #22c55e; color: #fff; text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+    .dl-btn:hover { background: #16a34a; }
+  </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="brand-icon">
-            <i class="fa-solid fa-bolt"></i>
-        </div>
-        <h2>PRIME BOT</h2>
-        <p class="subtitle">Link your WhatsApp account via pairing code</p>
+  <div class="card">
+    <h1>Prime Downloader</h1>
+    <p>Download TikTok videos without watermarks instantly</p>
 
-        <div class="input-group">
-            <label for="phone">Phone Number</label>
-            <input type="number" id="phone" placeholder="e.g. 2347070302246">
-        </div>
-
-        <button class="btn-submit" onclick="getPairingCode()">Generate Code</button>
-
-        <div id="status" class="status-msg"></div>
-
-        <div id="code-box" class="code-container">
-            <span id="code-val" class="code-text">XXXX-XXXX</span>
-            <button class="copy-btn" onclick="copyCode()">
-                <i class="fa-regular fa-copy"></i>
-                <span id="copy-text">Copy</span>
-            </button>
-        </div>
+    <div class="input-group">
+      <input type="text" id="urlInput" placeholder="Paste TikTok video link here...">
+      <button id="fetchBtn" onclick="downloadVideo()">Download Video</button>
     </div>
 
-    <script>
-        let generatedCode = "";
+    <div id="result">
+      <img id="thumb" src="" alt="Thumbnail">
+      <p id="videoTitle" style="margin-bottom: 12px; font-size: 0.85rem;"></p>
+      <a id="downloadLink" class="dl-btn" href="#" target="_blank" download>Download MP4 (No Watermark)</a>
+    </div>
+  </div>
 
-        async function getPairingCode() {
-            const phone = document.getElementById('phone').value.trim();
-            const status = document.getElementById('status');
-            const codeBox = document.getElementById('code-box');
+  <script>
+    async function downloadVideo() {
+      const urlInput = document.getElementById('urlInput').value.trim();
+      const fetchBtn = document.getElementById('fetchBtn');
+      const resultDiv = document.getElementById('result');
 
-            if (!phone) {
-                status.style.color = "#ef4444";
-                status.innerText = "Please enter a valid phone number!";
-                return;
-            }
+      if (!urlInput) {
+        alert('Please paste a TikTok link first!');
+        return;
+      }
 
-            codeBox.style.display = "none";
-            status.style.color = "#22c55e";
-            status.innerText = "Generating code...";
+      fetchBtn.innerText = 'Processing...';
+      fetchBtn.disabled = true;
+      resultDiv.style.display = 'none';
 
-            try {
-                const response = await fetch(`/pair?number=${phone}`);
-                const data = await response.json();
+      try {
+        // Automatically targets host URL when deployed together on Render
+        const response = await fetch('/api/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl: urlInput })
+        });
 
-                if (data.code) {
-                    status.innerText = "Code generated!.";
-                    generatedCode = data.code;
-                    document.getElementById('code-val').innerText = data.code;
-                    codeBox.style.display = "flex";
-                } else {
-                    status.style.color = "#ef4444";
-                    status.innerText = data.error || "Failed to generate pairing code.";
-                }
-            } catch (err) {
-                status.style.color = "#ef4444";
-                status.innerText = "Server connection error. Try again.";
-            }
+        const data = await response.json();
+
+        if (data.success) {
+          document.getElementById('thumb').src = data.cover;
+          document.getElementById('videoTitle').innerText = data.title;
+          document.getElementById('downloadLink').href = data.downloadUrl;
+          resultDiv.style.display = 'block';
+        } else {
+          alert(data.message || 'Failed to fetch video.');
         }
-
-        function copyCode() {
-            if (!generatedCode) return;
-            
-            // Clean dashes out if copying raw code for easy input
-            const cleanCode = generatedCode.replace(/-/g, '');
-            navigator.clipboard.writeText(cleanCode);
-
-            const copyText = document.getElementById('copy-text');
-            copyText.innerText = "Copied!";
-            setTimeout(() => {
-                copyText.innerText = "Copy";
-            }, 2000);
-        }
-    </script>
+      } catch (err) {
+        alert('Connection error. Please try again.');
+      } finally {
+        fetchBtn.innerText = 'Download Video';
+        fetchBtn.disabled = false;
+      }
+    }
+  </script>
 </body>
 </html>
