@@ -7,7 +7,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@tobyg74/tiktok-api-dl": "^1.2.0",
+    "axios": "^1.7.2",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   }
