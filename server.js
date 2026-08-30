@@ -1,5 +1,5 @@
 const express = require('express');
-const { default: makeWASocket, useMultiFileAuthState, delay } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const fs = require('fs');
 const path = require('path');
@@ -15,21 +15,38 @@ app.get('/pair', async (req, res) => {
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
 
     try {
+        // Fetch the latest version configuration from Baileys
+        const { version } = await fetchLatestBaileysVersion();
+
         const sock = makeWASocket({
             auth: state,
+            version,
             printQRInTerminal: false,
-            logger: pino({ level: 'silent' }),
-            browser: ["Ubuntu", "Chrome", "20.0.04"]
+            logger: pino({ level: 'fatal' }),
+            // Configures standard browser signature recognized by WhatsApp
+            browser: Browsers.macOS("Chrome"),
+            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: 0,
+            keepAliveIntervalMs: 10000,
+            emitOwnEvents: true,
+            fireInitQueries: true
         });
 
         sock.ev.on('creds.update', saveCreds);
-        await delay(2000);
+
+        // Allow socket connection to establish before requesting code
+        await delay(3000);
         
-        const code = await sock.requestPairingCode(num);
-        res.send({ code });
+        if (!sock.authState.creds.registered) {
+            const code = await sock.requestPairingCode(num);
+            // Format code clearly (e.g. XXXX-XXXX) if needed by user
+            res.send({ code: code?.match(/.{1,4}/g)?.join("-") || code });
+        }
 
         sock.ev.on('connection.update', async (update) => {
-            if (update.connection === 'open') {
+            const { connection } = update;
+
+            if (connection === 'open') {
                 await delay(3000);
                 const credsFile = path.join(sessionDir, 'creds.json');
                 if (fs.existsSync(credsFile)) {
@@ -38,7 +55,7 @@ app.get('/pair', async (req, res) => {
                     const sessionId = `PrimeBot~${sessionString}`;
 
                     await sock.sendMessage(`${num}@s.whatsapp.net`, {
-                        text: `*PRIME BOT SESSION ID*\n\nCopy this Session ID for deployment:\n\n\`\`\`${sessionId}\`\`\``
+                        text: `*PRIME BOT SESSION ID*\n\nHere is your Session ID. Copy it to deploy your bot:\n\n\`\`\`${sessionId}\`\`\`\n\n⚠️ Keep this private!`
                     });
                 }
                 await delay(2000);
@@ -46,9 +63,12 @@ app.get('/pair', async (req, res) => {
                 fs.rmSync(sessionDir, { recursive: true, force: true });
             }
         });
+
     } catch (e) {
-        if (!res.headersSent) res.status(500).send({ error: "Error occurred" });
+        console.error(e);
+        if (!res.headersSent) res.status(500).send({ error: "Failed to generate pairing code. Please try again." });
     }
 });
 
-app.listen(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Pairing server active on port ${PORT}`));
