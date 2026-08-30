@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Bot - Pairing</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: #fff; text-align: center; padding: 50px 20px; }
+        .box { background: #1e293b; max-width: 380px; margin: 0 auto; padding: 25px; border-radius: 12px; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; }
+        input { background: #0f172a; color: #fff; text-align: center; border: 1px solid #334155; }
+        button { background: #0284c7; color: #fff; font-weight: bold; cursor: pointer; }
+        #code { margin-top: 20px; font-size: 22px; color: #4ade80; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>PRIME BOT PAIRING</h2>
+        <p>Enter phone number with country code</p>
+        <input type="number" id="num" placeholder="e.g. 2348012345678">
+        <button onclick="getPair()">Get Pairing Code</button>
+        <div id="code"></div>
+    </div>
+    <script>
+        async function getPair() {
+            const num = document.getElementById('num').value.trim();
+            const display = document.getElementById('code');
+            if(!num) return alert("Enter a valid number!");
+            display.innerText = "Generating...";
+            try {
+                const res = await fetch(`/pair?number=${num}`);
+                const data = await res.json();
+                display.innerText = data.code ? `CODE: ${data.code}` : "Failed to get code";
+            } catch(e) {
+                display.innerText = "Server Error";
+            }
+        }
+    </script>
+</body>
+</html>
