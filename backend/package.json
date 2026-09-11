@@ -1,0 +1,16 @@
+{
+    "name": "prime-music-api",
+    "version": "1.0.0",
+    "description": "PRIME MUSIC API",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.57.4",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "multer": "^2.0.2"
+    }
+}
